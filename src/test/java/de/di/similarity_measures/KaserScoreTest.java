@@ -13,13 +13,14 @@ public class KaserScoreTest {
         kaser = new KaserScore();
 
         result = kaser.calculate("", "");
+        result = kaser.calculate("a", "a");
 
         result = kaser.calculate("jones", "johnson");
         result = kaser.calculate("Paul", "Pual");
         result = kaser.calculate("Paul Jones", "Jones, Paul");
         result = kaser.calculate("jones", "nnnnnnn");
         result = kaser.calculate("Prof._John_Doe", "Dr._John_Doe");
-
+        result = kaser.calculate("Professor_John_Doe", "John_Doe");
         result = kaser.calculate("rnnnnn", "znnnnn");
         result = kaser.calculate("ren", "zinn");
 

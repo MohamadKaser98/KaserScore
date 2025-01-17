@@ -54,6 +54,9 @@ public class KaserScore implements SimilarityMeasure{
 
         // Step 5: Final Similarity Equation Calculation
         double sim = similarityEquation(distAverage, s3.toString(), s4.toString());
+        if (Double.isNaN(sim)){
+            sim = 0.0;
+        }
         System.out.println("Similarity score of String: '" +string1+"' and String: '"+ string2 + "' is: "+ sim + "\n");
 
 
@@ -203,9 +206,9 @@ public class KaserScore implements SimilarityMeasure{
         double sim;
         int max = Math.max(s3.length(), s4.length());
 //        System.out.println(max);
-        if (distAverage == 0){
-            return 0.0;
-        }
+//        if (distAverage == 0){
+//            return 0.0;
+//        }
         if(distAverage > max){
             distAverage = distAverage / max;
         }
