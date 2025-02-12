@@ -16,8 +16,8 @@ public class KaserScore implements SimilarityMeasure{
         List<List<String>> matrix1 = constructCartesianProductMatrix(string1);
         List<List<String>> matrix2 = constructCartesianProductMatrix(string2);
 
-//        System.out.println("Matrix for " + string1 + ":");
-//        printMatrix(matrix1);
+        System.out.println("Matrix for " + string1 + ":");
+        printMatrix(matrix1);
 //        System.out.println("Matrix for " + string2 + ":");
 //        printMatrix(matrix2);
 
@@ -25,20 +25,20 @@ public class KaserScore implements SimilarityMeasure{
         List<List<String>> updatedMatrix1 = updateMatrix(string1, string2);
         List<List<String>> updatedMatrix2 = updateMatrix(string2, string1);
 
-//        System.out.println("Updated Matrix for " + string1 + ":");
-//        printMatrix(updatedMatrix1);
-//        System.out.println("Updated Matrix for " + string2 + ":");
-//        printMatrix(updatedMatrix2);
+        System.out.println("Updated Matrix for " + string1 + ":");
+        printMatrix(updatedMatrix1);
+        System.out.println("Updated Matrix for " + string2 + ":");
+        printMatrix(updatedMatrix2);
 
 
         // Step 3: Calculate Positional Distances between the letters and save it in the Matrix 3 and Matrix 4
         List<List<Double>> distanceMatrix3 = calculatePositionalDistances(updatedMatrix1, matrix2);
         List<List<Double>> distanceMatrix4 = calculatePositionalDistances(updatedMatrix2, matrix1);
 
-//        System.out.println("Positional Distance Matrix:");
-//        printDistanceMatrix(distanceMatrix3);
-//        System.out.println("Positional Distance Matrix:");
-//        printDistanceMatrix(distanceMatrix4);
+        System.out.println("Positional Distance Matrix:");
+        printDistanceMatrix(distanceMatrix3);
+        System.out.println("Positional Distance Matrix:");
+        printDistanceMatrix(distanceMatrix4);
 
         // This is the updated string that we need its size for the final equation
         StringBuilder s3 = updateString(string1, string2);
@@ -48,16 +48,17 @@ public class KaserScore implements SimilarityMeasure{
         // Step 4: Sum of the first row distance values that we saved in Matrix 3 and 4
         double sumOfDistancesValues = calculateTotalDistance(distanceMatrix3, s3.toString(), s4.toString()) + calculateTotalDistance(distanceMatrix4, s3.toString(), s4.toString());
         // The average of the sums of the first row values in M3 and M4. -could be changed later-
-        double distAverage = sumOfDistancesValues / 2;
+        // double distAverage = sumOfDistancesValues;
 //        System.out.println(distAverage);
 
 
         // Step 5: Final Similarity Equation Calculation
-        double sim = similarityEquation(distAverage, s3.toString(), s4.toString());
+        double sim = similarityEquation(sumOfDistancesValues, s3.toString(), s4.toString());
         if (Double.isNaN(sim)){
             sim = 0.0;
         }
         System.out.println("Similarity score of String: '" +string1+"' and String: '"+ string2 + "' is: "+ sim + "\n");
+
 
 
         return sim;
@@ -67,8 +68,16 @@ public class KaserScore implements SimilarityMeasure{
     // Calculates the KaserScore similarity of the two input string lists.
     @Override
     public double calculate(String[] strings1, String[] strings2) {
-        // To Do: Implement method to handle list input, possibly converting to single strings
-        return 0.0; // Placeholder
+        if (strings1 == null || strings2 == null) {
+            throw new IllegalArgumentException("Input string lists must not be null");
+        }
+
+        // Convert string arrays into single concatenated strings
+        String concatenatedString1 = String.join("", strings1);
+        String concatenatedString2 = String.join("", strings2);
+
+        // Apply the existing similarity calculation method
+        return calculate(concatenatedString1, concatenatedString2);
     }
 
     // Constructs the Cartesian product matrix for a given string
@@ -88,6 +97,7 @@ public class KaserScore implements SimilarityMeasure{
                 row.add("(" + i + ", " + c + ")");
             }
             matrix.add(row);
+            break;
         }
 
         return matrix;
@@ -142,6 +152,7 @@ public class KaserScore implements SimilarityMeasure{
                 colNr += 1;
             }
             distanceMatrix.add(distanceRow);
+            break;
         }
 
         return distanceMatrix;
@@ -183,44 +194,35 @@ public class KaserScore implements SimilarityMeasure{
         if(s3.length() == 1 && s4.length() == 1){
             return totalDistance;
         }else {
-            totalDistance = totalDistance * 2;
+            return totalDistance;
         }
 
-
-//        }else {
-//            for (List<Double> row : distanceMatrix) {
-//                for (double value : row) {
-//                    totalDistance += value;
-//                }
-//            }
-//        }
-
-        return totalDistance;
     }
 
 
 
 
 
-    private double similarityEquation( double distAverage, String s3, String s4 ){
+
+    private double similarityEquation( double dist, String s3, String s4 ){
         double sim;
         int max = Math.max(s3.length(), s4.length());
-//        System.out.println(max);
-//        if (distAverage == 0){
-//            return 0.0;
-//        }
-        if(distAverage > max){
-            distAverage = distAverage / max;
+
+        if(dist > max){
+            if (max == 1){
+                dist = 1;
+            }else {
+                dist = dist / max;
+            }
+
         }
         if(s3.length() == s4.length()){
-            sim = 1 - (distAverage / (Math.pow(Math.min(s3.length(), s4.length()), 2)));
+            sim = 1 - (dist / (Math.pow(Math.min(s3.length(), s4.length()), 2)));
         }else {
-            sim = 1 - (distAverage / max);
+            sim = 1 - (dist / max);
 //            System.out.println(sim);
         }
-        //sim = Math.round(sim * 100.0) / 100.0;
         return  sim;
-
     }
 
 
